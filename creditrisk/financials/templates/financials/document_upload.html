@@ -1,0 +1,381 @@
+{% load static %}
+{% load widget_tweaks %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Credit Risk Analysis Generator</title>
+  <link rel="stylesheet" href="{% static 'financials/css/styles.css' %}">
+  <style>
+    body {
+      background: linear-gradient(135deg, #e3f0ff 0%, #f9fbff 100%);
+      min-height: 100vh;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #222b36;
+      margin: 0;
+      padding: 0;
+    }
+    .main-bg {
+      min-height: 100vh;
+      padding: 40px 0 60px 0;
+    }
+    .stepper-row {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 110px;
+      margin-bottom: 0;
+    }
+    .stepper-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 1.09rem;
+      color: #bfc9db;
+      font-weight: 600;
+      position: relative;
+    }
+    .stepper-step.active {
+      color: #22c55e;
+    }
+    .stepper-step.current {
+      color: #2563eb;
+    }
+    .stepper-step .stepper-icon {
+      background: #e3f0ff;
+      color: #2563eb;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.7rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+      border: 2px solid #2563eb;
+      box-shadow: 0 1px 8px rgba(49,130,206,0.06);
+    }
+    .stepper-step.active .stepper-icon {
+      background: #22c55e;
+      color: #fff;
+      border: 2px solid #22c55e;
+    }
+    .stepper-step:not(.active):not(.current) .stepper-icon {
+      background: #f1f5fa;
+      color: #bfc9db;
+      border: 2px solid #e5e7eb;
+    }
+    .stepper-label {
+      font-size: 1.02rem;
+      font-weight: 700;
+    }
+    .stepper-desc {
+      font-size: 0.99rem;
+      color: #a0aec0;
+      font-weight: 400;
+      margin-top: 2px;
+    }
+    .stepper-bar {
+      width: 480px;
+      height: 4px;
+      background: #2563eb;
+      border-radius: 2px;
+      margin: 12px auto 32px auto;
+      position: relative;
+      z-index: 1;
+    }
+    .upload-card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(49, 130, 206, 0.13), 0 1.5px 7px rgba(0,0,0,0.04);
+      max-width: 700px;
+      margin: 0 auto 38px auto;
+      padding: 38px 36px 32px 36px;
+      text-align: left;
+    }
+    .upload-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 4px;
+      color: #111827;
+    }
+    .upload-desc {
+      text-align: center;
+      color: #64748b;
+      font-size: 1rem;
+      margin-bottom: 26px;
+    }
+    .doc-upload-section {
+      background: #f8fbff;
+      border: 1.5px solid #e3eaf5;
+      border-radius: 14px;
+      margin-bottom: 28px;
+      padding: 22px 18px 18px 18px;
+      box-shadow: 0 2px 8px rgba(49,130,206,0.04);
+    }
+    .doc-label {
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: #2563eb;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .doc-label svg {
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+    .doc-sub {
+      color: #64748b;
+      font-size: 0.98rem;
+      margin-bottom: 10px;
+      margin-left: 2px;
+    }
+    .drop-area {
+      border: 2px dashed #b4c6e7;
+      border-radius: 12px;
+      padding: 36px 0 24px 0;
+      background: #f9fafb;
+      text-align: center;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 0;
+      position: relative;
+    }
+    .drop-area.drag-over {
+      border-color: #2563eb;
+      background: #e0edff;
+      box-shadow: 0 0 0 2px #2563eb33;
+    }
+    .drop-icon {
+      color: #b4c6e7;
+      font-size: 2.2rem;
+      margin-bottom: 7px;
+    }
+    .drop-text {
+      color: #64748b;
+      font-size: 1.08rem;
+      margin-bottom: 10px;
+    }
+    .browse-btn {
+      display: inline-block;
+      background: #2563eb;
+      color: #fff;
+      font-weight: 700;
+      padding: 9px 22px;
+      border-radius: 7px;
+      font-size: 1.01rem;
+      cursor: pointer;
+      margin-bottom: 0;
+      margin-top: 2px;
+      transition: background 0.2s;
+      border: none;
+    }
+    .drop-area:hover .browse-btn {
+      background: #1743a2;
+    }
+    .upload-input {
+      display: none;
+    }
+    .file-selected {
+      display: block;
+      margin-top: 10px;
+      color: #2563eb;
+      font-size: 1.01rem;
+      font-weight: 600;
+      word-break: break-all;
+    }
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .btn-back {
+      background: #f3f6fd;
+      color: #374151;
+      border: 1.5px solid #e5e7eb;
+      padding: 10px 28px;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .btn-primary {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      padding: 10px 28px;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover {
+      background: #1743a2;
+    }
+    @media (max-width: 900px) {
+      .upload-card, .stepper-row {
+        max-width: 98vw;
+        padding: 0 2vw;
+      }
+      .stepper-row {
+        gap: 32px;
+      }
+      .stepper-bar {
+        width: 90vw;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="main-bg">
+  <div class="stepper-row">
+    <div class="stepper-step active">
+      <div class="stepper-icon">✔️</div>
+      <span class="stepper-label" style="color:#22c55e;">Step 1</span>
+      <span class="stepper-desc">Company Information</span>
+    </div>
+    <div class="stepper-step current">
+      <div class="stepper-icon" style="background:#2563eb;color:#fff;">+</div>
+      <span class="stepper-label" style="color:#2563eb;">Step 2</span>
+      <span class="stepper-desc">Financial Documents</span>
+    </div>
+    <div class="stepper-step">
+      <div class="stepper-icon" style="background:#f1f5fa;color:#b4c6e7;">↑</div>
+      <span class="stepper-label">Step 3</span>
+      <span class="stepper-desc">Analysis Complete</span>
+    </div>
+  </div>
+  <div class="stepper-bar"></div>
+
+  <div class="upload-card">
+    <h2 class="upload-title">Financial Documents</h2>
+    <div class="upload-desc">Upload your financial statements for analysis</div>
+    <h3 class="upload-title" style="font-size:1.09rem;margin-bottom:6px;">Upload Financial Documents</h3>
+    <p class="upload-desc" style="margin-bottom:22px;">Please upload your latest financial statements in PDF format. All three documents are required for analysis.</p>
+    <form method="post" enctype="multipart/form-data" class="upload-form">
+      {% csrf_token %}
+
+      <!-- Balance Sheet -->
+      <div class="doc-upload-section">
+        <div class="doc-label">
+          <svg width="20" height="20" fill="none"><rect width="20" height="20" rx="4" fill="#2563eb1a"/><path d="M7 10.5l2 2 4-4" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Balance Sheet
+        </div>
+        <div class="doc-sub">Upload the latest balance sheet (PDF format)</div>
+        <div class="drop-area" id="drop-balance">
+          <span class="drop-icon">🗂️</span>
+          <div class="drop-text">Drag and drop your PDF here, or</div>
+          <button class="browse-btn" type="button">Browse Files</button>
+          {% render_field document_form.balance_sheet class+="upload-input" id="id_balance_sheet" %}
+          <span class="file-selected" id="file-selected-balance"></span>
+        </div>
+      </div>
+
+      <!-- Income Statement -->
+      <div class="doc-upload-section">
+        <div class="doc-label">
+          <svg width="20" height="20" fill="none"><rect width="20" height="20" rx="4" fill="#2563eb1a"/><path d="M7 10.5l2 2 4-4" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Income Statement
+        </div>
+        <div class="doc-sub">Upload the latest income statement (PDF format)</div>
+        <div class="drop-area" id="drop-income">
+          <span class="drop-icon">🗂️</span>
+          <div class="drop-text">Drag and drop your PDF here, or</div>
+          <button class="browse-btn" type="button">Browse Files</button>
+          {% render_field document_form.income_statement class+="upload-input" id="id_income_statement" %}
+          <span class="file-selected" id="file-selected-income"></span>
+        </div>
+      </div>
+
+      <!-- Cash Flow Statement -->
+      <div class="doc-upload-section">
+        <div class="doc-label">
+          <svg width="20" height="20" fill="none"><rect width="20" height="20" rx="4" fill="#2563eb1a"/><path d="M7 10.5l2 2 4-4" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Cash Flow Statement
+        </div>
+        <div class="doc-sub">Upload the latest cash flow statement (PDF format)</div>
+        <div class="drop-area" id="drop-cashflow">
+          <span class="drop-icon">🗂️</span>
+          <div class="drop-text">Drag and drop your PDF here, or</div>
+          <button class="browse-btn" type="button">Browse Files</button>
+          {% render_field document_form.cash_flow_statement class+="upload-input" id="id_cash_flow_statement" %}
+          <span class="file-selected" id="file-selected-cashflow"></span>
+        </div>
+      </div>
+
+      <div class="form-actions" style="margin-top:32px;">
+        <a href="{% url 'company_info' %}" class="btn-back">Back</a>
+
+        <button type="submit" class="btn-primary">Upload</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const setups = [
+    { inputId: 'id_balance_sheet', dropId: 'drop-balance', fileId: 'file-selected-balance' },
+    { inputId: 'id_income_statement', dropId: 'drop-income', fileId: 'file-selected-income' },
+    { inputId: 'id_cash_flow_statement', dropId: 'drop-cashflow', fileId: 'file-selected-cashflow' }
+  ];
+
+  setups.forEach(setup => {
+    const input = document.getElementById(setup.inputId);
+    const dropArea = document.getElementById(setup.dropId);
+    const fileSelected = document.getElementById(setup.fileId);
+    const browseBtn = dropArea.querySelector('.browse-btn');
+
+    browseBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      input.click();
+    });
+
+    input.addEventListener('change', function() {
+      if (this.files.length > 0) {
+        fileSelected.textContent = `Selected: ${this.files[0].name}`;
+      } else {
+        fileSelected.textContent = '';
+      }
+    });
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropArea.addEventListener(eventName, () => {
+        dropArea.classList.add('drag-over');
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, () => {
+        dropArea.classList.remove('drag-over');
+      }, false);
+    });
+
+    dropArea.addEventListener('drop', function(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files.length) {
+        input.files = files;
+        input.dispatchEvent(new Event('change'));
+      }
+    });
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,356 @@
+{% load static %}
+{% load widget_tweaks %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Credit Risk Analysis Generator</title>
+  <link rel="stylesheet" href="{% static 'financials/css/styles.css' %}">
+  <style>
+    body, html {
+      background: linear-gradient(135deg, #e3f0ff 0%, #f9fbff 100%);
+      min-height: 100vh;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #222b36;
+      margin: 0;
+      padding: 0;
+    }
+    .main-bg {
+      min-height: 100vh;
+      padding-bottom: 60px;
+    }
+    .centered-header {
+      text-align: center;
+      margin-top: 42px;
+      margin-bottom: 18px;
+    }
+    .centered-header h1 {
+      font-size: 2.1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .centered-header .subtitle {
+      color: #64748b;
+      font-size: 1.07rem;
+      margin-bottom: 0;
+    }
+    .stepper-row {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 110px;
+    margin-bottom: 22px;
+    }
+    .stepper-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 1.06rem;
+      color: #bfc9db;
+      font-weight: 600;
+      position: relative;
+    }
+    .stepper-step.active {
+      color: #2563eb;
+    }
+    .stepper-step .stepper-icon {
+      background: #e3f0ff;
+      color: #2563eb;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.7rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+      border: 2px solid #2563eb;
+      box-shadow: 0 1px 8px rgba(49,130,206,0.06);
+    }
+    .stepper-step:not(.active) .stepper-icon {
+      background: #f1f5fa;
+      color: #bfc9db;
+      border: 2px solid #e5e7eb;
+    }
+    .stepper-label {
+      font-size: 1.01rem;
+      font-weight: 600;
+    }
+    .stepper-desc {
+      font-size: 0.99rem;
+      color: #a0aec0;
+      font-weight: 400;
+      margin-top: 2px;
+    }
+    .stepper-bar {
+      width: 380px;
+      height: 3.5px;
+      background: #2563eb;
+      border-radius: 2px;
+      margin: 0 auto 32px auto;
+      position: relative;
+      top: -22px;
+      z-index: 1;
+    }
+    .form-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(49, 130, 206, 0.13), 0 1.5px 7px rgba(0,0,0,0.04);
+      max-width: 630px;
+      margin: 0 auto 38px auto;
+      padding: 38px 36px 32px 36px;
+      text-align: left;
+    }
+    .form-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 4px;
+      color: #222b36;
+    }
+    .form-subtitle {
+      text-align: center;
+      color: #6b7a8f;
+      margin-bottom: 28px;
+      font-size: 1.05rem;
+    }
+    .company-form .form-row {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 18px;
+    }
+    .company-form .form-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .company-form .form-group.full-width {
+      flex: 2;
+    }
+    .company-form label {
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #1e293b;
+      font-size: 1rem;
+    }
+    .company-form input,
+    .company-form textarea {
+      padding: 11px 13px;
+      border: 1.5px solid #dbeafe;
+      border-radius: 7px;
+      font-size: 1rem;
+      background: #f1f5fa;
+      transition: border 0.2s;
+      font-family: inherit;
+      color: #1e293b;
+      margin-bottom: 0;
+    }
+    .company-form input:focus,
+    .company-form textarea:focus {
+      border-color: #2563eb;
+      outline: none;
+      background: #fff;
+    }
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .btn-primary {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      padding: 10px 28px;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover {
+      background: #1743a2;
+    }
+    .btn-back {
+      background: #f3f6fd;
+      color: #374151;
+      border: 1.5px solid #e5e7eb;
+      padding: 10px 28px;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .btn-back:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    .features-row {
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      margin: 60px auto 0 auto;
+      max-width: 900px;
+    }
+    .feature-item {
+      flex: 1;
+      min-width: 220px;
+      text-align: center;
+    }
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      margin: 0 auto 14px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 12px rgba(49,130,206,0.06);
+      font-size: 2rem;
+    }
+    .feature-icon-blue {
+      background: #e4edff;
+      color: #2563eb;
+    }
+    .feature-icon-green {
+      background: #e7fbe9;
+      color: #22c55e;
+    }
+    .feature-icon-pink {
+      background: #fae6f7;
+      color: #ec4899;
+    }
+    .feature-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 4px;
+    }
+    .feature-desc {
+      color: #64748b;
+      font-size: 1rem;
+      margin-bottom: 0;
+    }
+    @media (max-width: 900px) {
+      .form-card, .centered-header, .stepper-row {
+        max-width: 98vw;
+        padding: 0 2vw;
+      }
+      .features-row {
+        flex-direction: column;
+        gap: 28px;
+        padding: 0 16px;
+      }
+      .feature-item {
+        margin-bottom: 20px;
+      }
+      .company-form .form-row {
+        flex-direction: column;
+        gap: 0;
+      }
+      .stepper-row {
+      gap: 32px;
+      }
+      .stepper-bar {
+        width: 90vw;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="main-bg">
+  <div class="centered-header">
+    <h1>Credit Risk Analysis Generator</h1>
+    <div class="subtitle">Automated financial analysis and credit scoring powered by advanced algorithms</div>
+  </div>
+  <!-- Stepper Navigation -->
+<div class="stepper-row">
+  <div class="stepper-step active">
+    <div class="stepper-icon">1</div>
+    <span class="stepper-label">Step 1</span>
+    <span class="stepper-desc">Company Information</span>
+  </div>
+  <div class="stepper-step">
+    <div class="stepper-icon">2</div>
+    <span class="stepper-label">Step 2</span>
+    <span class="stepper-desc">Financial Documents</span>
+  </div>
+  <div class="stepper-step">
+    <div class="stepper-icon">3</div>
+    <span class="stepper-label">Step 3</span>
+    <span class="stepper-desc">Analysis Complete</span>
+  </div>
+</div>
+<div class="stepper-bar"></div>
+
+
+  <div class="form-card">
+    <h2 class="form-title">Company Information</h2>
+    <div class="form-subtitle">Please provide your company’s basic information</div>
+    <form method="post" class="company-form">
+      {% csrf_token %}
+      <div class="form-row">
+        <div class="form-group">
+          <label for="id_company_name">Company Name *</label>
+          {% render_field company_form.company_name class+="input" placeholder="Enter company name" %}
+        </div>
+        <div class="form-group">
+          <label for="id_company_number">Company Registration Number *</label>
+          {% render_field company_form.company_number class+="input" placeholder="Enter registration number" %}
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="id_company_pan">Company PAN *</label>
+          {% render_field company_form.company_pan class+="input" placeholder="Enter PAN number" %}
+        </div>
+        <div class="form-group">
+          <label for="id_website">Website</label>
+          {% render_field company_form.website class+="input" placeholder="https://www.company.com" %}
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="id_incorporated_on">Date of Incorporation</label>
+          {% render_field company_form.incorporated_on class+="input" placeholder="mm / dd / yyyy" %}
+        </div>
+        <div class="form-group">
+          <label for="id_location">Location</label>
+          {% render_field company_form.location class+="input" placeholder="City, State, Country" %}
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group full-width">
+          <label for="id_line_of_business">Line of Business *</label>
+          {% render_field company_form.line_of_business class+="input" placeholder="Describe the main business activities..." %}
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-back" disabled>Back</button>
+        <button type="submit" class="btn-primary">Next</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="features-row">
+    <div class="feature-item">
+      <div class="feature-icon feature-icon-blue">📄</div>
+      <div class="feature-title">Document Analysis</div>
+      <div class="feature-desc">Advanced PDF parsing of financial statements to extract key metrics</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon feature-icon-green">📈</div>
+      <div class="feature-title">Credit Scoring</div>
+      <div class="feature-desc">Comprehensive credit risk assessment using industry-standard ratios</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon feature-icon-pink">✔️</div>
+      <div class="feature-title">Detailed Reports</div>
+      <div class="feature-desc">Professional Word document reports with detailed analysis and recommendations</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

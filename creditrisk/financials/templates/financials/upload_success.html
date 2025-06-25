@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload Success</title>
+  <link rel="stylesheet" href="{% static 'financials/css/styles.css' %}">
+</head>
+<body>
+<div class="container">
+  <div class="alert success">
+    <h2>✅ Upload Successful!</h2>
+    <p>Financial data for <strong>{{ company.company_name }}</strong> has been processed successfully.</p>
+    <a href="/upload/" class="btn">Upload Another</a>
+  </div>
+
+  {% if financials %}
+    <h3>📊 Balance Sheet Metrics (Latest Year)</h3>
+    <table border="1" cellpadding="5" cellspacing="0">
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for label, value in financials.items %}
+          <tr>
+            <td><strong>{{ label }}</strong></td>
+            <td>{{ value|default:"-" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+
+  <h3>🏅 Credit Scores</h3>
+  <table border="1" cellpadding="5" cellspacing="0">
+    <thead>
+      <tr>
+        <th>Year</th>
+        <th>Score</th>
+        <th>Category</th>
+        <th>Risk Bucket</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in credit_scores %}
+        <tr>
+          <td>{{ entry.year }}</td>
+          <td>{{ entry.score }}</td>
+          <td>{{ entry.category }}</td>
+          <td>{{ entry.risk_bucket }}</td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="4">No credit scores found.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="report-download" style="margin-top: 30px;">
+    <p>📥 <strong>To view the complete analysis (including company details, extracted metrics, derived metrics, and weights used):</strong></p>
+    <a href="{% url 'download_report' %}" class="btn">Download Full Report (.docx)</a>
+
+  </div>
+</div>
+</body>
+</html>
